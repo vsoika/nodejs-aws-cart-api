@@ -1,4 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Cart as CartRepo } from '../../database/entities/cart.entity';
 
 import { v4 } from 'uuid';
 
@@ -6,26 +9,28 @@ import { Cart } from '../models';
 
 @Injectable()
 export class CartService {
-  private userCarts: Record<string, Cart> = {};
+  constructor(
+    @InjectRepository(CartRepo) private readonly cartRepository: Repository<Cart>,
+  ) {}
+  // private userCarts: Record<string, Cart> = {};
 
-  findByUserId(userId: string): Cart {
-    return this.userCarts[ userId ];
+  findByUserId(user_id: string) {
+      return this.cartRepository.findOneBy({ user_id });
   }
 
   createByUserId(userId: string) {
-    const id = v4();
+    // const id = v4();
     const userCart = {
-      id,
-      items: [],
-    };
+      user_id: userId,
+    } as unknown as Cart;
 
-    this.userCarts[ userId ] = userCart;
+    this.cartRepository.save(userCart)
 
     return userCart;
   }
 
-  findOrCreateByUserId(userId: string): Cart {
-    const userCart = this.findByUserId(userId);
+  async findOrCreateByUserId(userId: string): Promise<Cart> {
+    const userCart = await this.findByUserId(userId);
 
     if (userCart) {
       return userCart;
@@ -34,22 +39,21 @@ export class CartService {
     return this.createByUserId(userId);
   }
 
-  updateByUserId(userId: string, { items }: Cart): Cart {
-    const { id, ...rest } = this.findOrCreateByUserId(userId);
+  // updateByUserId(userId: string, { items }): Cart {
+  //   const { id, ...rest } = this.findOrCreateByUserId(userId);
 
-    const updatedCart = {
-      id,
-      ...rest,
-      items: [ ...items ],
-    }
+  //   const updatedCart = {
+  //     id,
+  //     ...rest,
+  //     items: [...items],
+  //   };
 
-    this.userCarts[ userId ] = { ...updatedCart };
+  //   this.userCarts[userId] = { ...updatedCart };
 
-    return { ...updatedCart };
-  }
+  //   return { ...updatedCart };
+  // }
 
   removeByUserId(userId): void {
-    this.userCarts[ userId ] = null;
+    this.cartRepository.delete(userId);
   }
-
 }
