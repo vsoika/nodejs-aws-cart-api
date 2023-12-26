@@ -9,7 +9,7 @@ export class CartItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Cart, (cart) => cart.id, { onDelete: "CASCADE" })
+  @ManyToOne(() => Cart, (cart) => cart.id, { orphanedRowAction: 'delete' })
   @JoinColumn({ name: 'cart_id' })
   cart: Cart;
 

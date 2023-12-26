@@ -32,8 +32,6 @@ export class CartController {
       getUserIdFromRequest(req),
     );
 
-    console.log('cart', cart);
-
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
@@ -64,8 +62,8 @@ export class CartController {
   // @UseGuards(JwtAuthGuard)
   @UseGuards(BasicAuthGuard)
   @Delete()
-  clearUserCart(@Req() req: AppRequest) {
-    this.cartService.removeByUserId(getUserIdFromRequest(req));
+  async clearUserCart(@Req() req: AppRequest) {
+    await this.cartService.removeByUserId(getUserIdFromRequest(req));
 
     return {
       statusCode: HttpStatus.OK,

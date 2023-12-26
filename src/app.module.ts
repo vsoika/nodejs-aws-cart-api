@@ -27,18 +27,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             synchronize: false,
             logging: ["query", "error"],
             maxQueryExecutionTime: 1000,
-            // extra: {
-            // //   poolSize: 1000,
-            //   connectionTimeoutMillis: 100000,
-            //   query_timeout: 100000,
-            //   statement_timeout: 100000
-            // },
             ssl: {
               rejectUnauthorized: false,
             },
           } as TypeOrmModuleOptions;
-
-          console.log(' process.env',  process.env);
 
           return options;
         } catch (err) {

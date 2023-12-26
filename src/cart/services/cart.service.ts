@@ -23,17 +23,16 @@ export class CartService {
     });
   }
 
-  createByUserId(userId: string) {
+  async createByUserId(userId: string) {
     const id = v4();
     const userCart = {
       id,
       user_id: userId,
+      status: "OPEN",
       items: [],
     };
 
-    console.log('userCart', userCart);
-
-    this.cartRepository.save(userCart);
+    await this.cartRepository.insert(userCart);
 
     return userCart;
   }
@@ -51,12 +50,12 @@ export class CartService {
   }
 
   async updateByUserId(userId: string, { items }): Promise<Cart> {
-    const { id, ...rest } = await this.findOrCreateByUserId(userId);
+    const { id, items: cartItems, ...rest } = await this.findOrCreateByUserId(userId);
 
     const updatedCart = {
       id,
       ...rest,
-      items: [...items],
+      items: [...items, ...cartItems],
     };
 
     const updatedCartEntity = await this.cartRepository.preload(updatedCart);
@@ -68,9 +67,8 @@ export class CartService {
     return { ...updatedCart };
   }
 
-  removeByUserId(userId): void {
-    console.log('userId', userId);
+  async removeByUserId(userId): Promise<void> {
 
-    this.cartRepository.delete({ user_id: userId });
+    await this.cartRepository.delete({user_id: userId});
   }
 }
