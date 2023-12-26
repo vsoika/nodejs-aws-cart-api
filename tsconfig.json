@@ -12,6 +12,7 @@
     "baseUrl": "./",
     "incremental": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "moduleResolution": "node",
   }
 }

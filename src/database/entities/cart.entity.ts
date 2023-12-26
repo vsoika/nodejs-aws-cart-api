@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { CartItem } from './cart_items.entity';
 
-@Entity('cart')
+@Entity({ name: 'cart', schema: 'public' })
 export class Cart {
   /**
    * this decorator will help to auto generate id for the table.
@@ -25,4 +27,9 @@ export class Cart {
 
   @Column({ type: 'enum', enum: ['OPEN', 'ORDERED'] })
   status: string;
+
+  @OneToMany(() => CartItem, (item) => item.cart, {
+    eager: true, 
+  })
+  items: CartItem[];
 }

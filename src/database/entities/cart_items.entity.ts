@@ -1,12 +1,17 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Cart } from './cart.entity';
 
-@Entity('cart_item')
+@Entity({ name: 'cart_items', schema: 'public' })
 export class CartItem {
   /**
    * this decorator will help to auto generate id for the table.
    */
-  @PrimaryColumn({ type: 'uuid' })
-  cart_id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Cart, (cart) => cart.id, { onDelete: "CASCADE" })
+  @JoinColumn({ name: 'cart_id' })
+  cart: Cart;
 
   @Column({ type: 'uuid' })
   product_id: string;
