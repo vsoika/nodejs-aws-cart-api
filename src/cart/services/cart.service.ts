@@ -19,7 +19,7 @@ export class CartService {
       items: [],
     };
 
-    this.userCarts[ userId ] = userCart;
+    this.userCarts[ userId ] = userCart as Cart;
 
     return userCart;
   }
@@ -31,7 +31,7 @@ export class CartService {
       return userCart;
     }
 
-    return this.createByUserId(userId);
+    return this.createByUserId(userId) as Cart;
   }
 
   updateByUserId(userId: string, { items }: Cart): Cart {
