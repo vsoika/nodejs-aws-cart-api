@@ -18,14 +18,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         try {
           const options = {
             type: 'postgres',
-            host: process.env.DATABASE_HOST,
-            port: +process.env.DATABASE_PORT,
-            password: process.env.DATABASE_PASSWORD,
-            username: process.env.DATABASE_USERNAME,
+            // variable names are unique for connection to RDS from the Elastic Beanstalk env
+            // https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.db.html
+            host: process.env.RDS_HOSTNAME,
+            port: +process.env.RDS_PORT,
+            password: process.env.RDS_PASSWORD,
+            username: process.env.RDS_USERNAME,
             entities: [Cart, CartItem],
-            database: process.env.DATABASE_NAME,
+            database: process.env.RDS_DB_NAME,
             synchronize: false,
-            logging: ["query", "error"],
+            logging: ['query', 'error'],
             maxQueryExecutionTime: 1000,
             ssl: {
               rejectUnauthorized: false,
