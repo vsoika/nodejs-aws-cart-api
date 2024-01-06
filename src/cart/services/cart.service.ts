@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Cart } from '../../database/entities/cart.entity';
 
 import { v4 } from 'uuid';
+import { CartItem } from 'src/database/entities/cart_items.entity';
 
 // import { Cart } from '../models';
 
@@ -12,6 +13,9 @@ export class CartService {
   constructor(
     @InjectRepository(Cart)
     private readonly cartRepository: Repository<Cart>,
+
+    @InjectRepository(CartItem)
+    private cartItemRepository: Repository<CartItem>,
   ) {}
   private userCarts: Record<string, Cart> = {};
 
@@ -28,7 +32,7 @@ export class CartService {
     const userCart = {
       id,
       user_id: userId,
-      status: "OPEN",
+      status: 'OPEN',
       items: [],
     };
 
@@ -49,13 +53,44 @@ export class CartService {
     return newUser;
   }
 
-  async updateByUserId(userId: string, { items }): Promise<Cart> {
-    const { id, items: cartItems, ...rest } = await this.findOrCreateByUserId(userId);
+  async updateByUserId(userId: string, { product, count }): Promise<Cart> {
+    const {
+      id,
+      items: cartItems,
+      ...rest
+    } = await this.findOrCreateByUserId(userId);
+
+    const existingProductItem = cartItems.find(
+      (item) => item?.product === product.id,
+    );
+
+    const item_id = v4();
+    const newProductItem = {
+      id: item_id,
+      cart_id: id,
+      product_id: product.id,
+      product,
+      count,
+    } as unknown as CartItem;
+
+    const item: CartItem = existingProductItem
+      ? {
+          count,
+          ...existingProductItem,
+        }
+      : { ...newProductItem };
+
+    if (!existingProductItem) {
+      await this.cartItemRepository.insert(newProductItem);
+    }
 
     const updatedCart = {
       id,
       ...rest,
-      items: [...items, ...cartItems],
+      items: [
+        ...[item],
+        ...cartItems.filter((item) => item?.product_id !== product.id),
+      ],
     };
 
     const updatedCartEntity = await this.cartRepository.preload(updatedCart);
@@ -68,7 +103,6 @@ export class CartService {
   }
 
   async removeByUserId(userId): Promise<void> {
-
-    await this.cartRepository.delete({user_id: userId});
+    await this.cartRepository.delete({ user_id: userId });
   }
 }

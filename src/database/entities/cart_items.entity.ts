@@ -18,4 +18,12 @@ export class CartItem {
 
   @Column({ type: 'int' })
   count: number;
+
+  @Column({ type: 'json' })
+  product?: {
+    price: number;
+    id: string;
+    description: string;
+    title: string;
+  };
 }
